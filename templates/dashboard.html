@@ -1,2 +1,117 @@
-<h2>Welcome! You are logged in 🎉</h2>
-<a href="/">Logout</a>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* split screen half-half */
+      gap: 20px;
+    }
+    .left {
+      border-right: 1px solid #ddd;
+      padding-right: 20px;
+    }
+    .right {
+      padding-left: 20px;
+    }
+    canvas {
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dashboard</h1>
+
+  <div class="container">
+    <!-- Left side: form + task list -->
+    <div class="left">
+      <form id="taskForm">
+        <input name="title" placeholder="Task Title" required>
+        <input type="datetime-local" name="start_time" required>
+        <input type="datetime-local" name="end_time" required>
+        <button type="submit">Add Task</button>
+      </form>
+
+      <h2>Your Tasks</h2>
+      <ul id="taskList"></ul>
+    </div>
+
+    <!-- Right side: charts -->
+    <div class="right">
+      <h2>Daily Records</h2>
+      <canvas id="dailyChart"></canvas>
+
+      <h2>Monthly Records</h2>
+      <canvas id="monthlyChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    async function loadTasks() {
+      const res = await fetch('/api/tasks');
+      const tasks = await res.json();
+      renderTasks(tasks);
+      renderCharts(tasks);
+    }
+
+    function renderTasks(tasks) {
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+      tasks.forEach(t => {
+        const li = document.createElement('li');
+        li.textContent = `${t.title} - ${t.duration} mins (${t.start_time} → ${t.end_time})`;
+        list.appendChild(li);
+      });
+    }
+
+    function renderCharts(tasks) {
+      const daily = {};
+      const monthly = {};
+
+      tasks.forEach(t => {
+        const day = new Date(t.start_time).toLocaleDateString();
+        daily[day] = (daily[day] || 0) + t.duration;
+
+        const month = new Date(t.start_time).toLocaleString('default', { month: 'short', year: 'numeric' });
+        monthly[month] = (monthly[month] || 0) + t.duration;
+      });
+
+      new Chart(document.getElementById('dailyChart'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(daily),
+          datasets: [{ label: 'Minutes Spent per Day', data: Object.values(daily) }]
+        }
+      });
+
+      new Chart(document.getElementById('monthlyChart'), {
+        type: 'line',
+        data: {
+          labels: Object.keys(monthly),
+          datasets: [{ label: 'Minutes Spent per Month', data: Object.values(monthly) }]
+        }
+      });
+    }
+
+    document.getElementById('taskForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      await fetch('/api/tasks', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      e.target.reset();
+      loadTasks();
+    });
+
+    loadTasks();
+  </script>
+</body>
+</html>
