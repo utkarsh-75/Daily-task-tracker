@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -98,20 +99,22 @@
         }
       });
     }
+document.getElementById('taskForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target).entries());
 
-    document.getElementById('taskForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const data = Object.fromEntries(new FormData(e.target).entries());
-      await fetch('/api/tasks', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-      e.target.reset();
-      loadTasks();
-    });
+  // Append :00 seconds if missing
+  if (data.start_time.length === 16) data.start_time += ":00";
+  if (data.end_time.length === 16) data.end_time += ":00";
 
-    loadTasks();
+  await fetch('/api/tasks', {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+  e.target.reset();
+  loadTasks();
+});
   </script>
 </body>
 </html>

@@ -21,6 +21,7 @@ class Task(db.Model):
     title = db.Column(db.Text, nullable=False)
     start_time = db.Column(db.DateTime)
     end_time = db.Column(db.DateTime)
+    duration = db.Column(db.Integer)   
 
 with app.app_context():
     db.create_all()
@@ -59,10 +60,12 @@ def signup():
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for("login"))
-    return render_template("dashboard.html")
+    
+    tasks = Task.query.filter_by(user_id=session['user_id']).all()
+    return render_template("dashboard.html", tasks=tasks)
  
+from datetime import datetime
 
-# Fetch tasks for logged-in user
 @app.route("/api/tasks", methods=["GET", "POST"])
 def tasks():
     if 'user_id' not in session:
@@ -70,28 +73,52 @@ def tasks():
 
     if request.method == "POST":
         data = request.get_json()
+        if not data:
+            return jsonify({"error": "No JSON received"}), 400
+
+        # Convert strings to datetime
+        try:
+            start_time = datetime.fromisoformat(data['start_time'])
+            end_time = datetime.fromisoformat(data['end_time'])
+        except Exception as e:
+            return jsonify({"error": f"Invalid date format: {str(e)}"}), 400
+
+        # Calculate duration in minutes
+        duration = int((end_time - start_time).total_seconds() / 60)
+
+        # Create and save task
         new_task = Task(
             user_id=session['user_id'],
             title=data['title'],
-            start_time=data['start_time'],
-            end_time=data['end_time']
+            start_time=start_time,
+            end_time=end_time,
+            duration=duration
         )
-        db.session.add(new_task)
-        db.session.commit()
+
+        try:
+            db.session.add(new_task)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"DB error: {str(e)}"}), 500
+
         return jsonify({
             "id": new_task.id,
             "title": new_task.title,
             "start_time": str(new_task.start_time),
-            "end_time": str(new_task.end_time)
+            "end_time": str(new_task.end_time),
+            "duration": new_task.duration
         })
 
+    # GET tasks for current user
     tasks = Task.query.filter_by(user_id=session['user_id']).all()
     return jsonify([
         {
             "id": t.id,
             "title": t.title,
             "start_time": str(t.start_time),
-            "end_time": str(t.end_time)
+            "end_time": str(t.end_time),
+            "duration": t.duration
         } for t in tasks
     ])
 
@@ -107,11 +134,26 @@ def update_delete_task(task_id):
 
     if request.method == "PUT":
         data = request.get_json()
+        try:
+            start_time = datetime.fromisoformat(data['start_time'])
+            end_time = datetime.fromisoformat(data['end_time'])
+        except Exception as e:
+            return jsonify({"error": f"Invalid date format: {str(e)}"}), 400
+
         task.title = data['title']
-        task.start_time = data['start_time']
-        task.end_time = data['end_time']
+        task.start_time = start_time
+        task.end_time = end_time
+        task.duration = int((end_time - start_time).total_seconds() / 60)
+
         db.session.commit()
-        return jsonify({"success": True})
+        return jsonify({
+            "success": True,
+            "id": task.id,
+            "title": task.title,
+            "start_time": str(task.start_time),
+            "end_time": str(task.end_time),
+            "duration": task.duration
+        })
 
     if request.method == "DELETE":
         db.session.delete(task)
