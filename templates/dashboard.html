@@ -5,160 +5,187 @@
   <title>Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-   /* Reset defaults */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: radial-gradient(ellipse at bottom, #0d0d0d 0%, #1a1a1a 100%);
-  color: #fff;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+    /* Reset defaults */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at bottom, #0d0d0d 0%, #1a1a1a 100%);
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-/* Starry background effect */
-body::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('https://img.goodfon.com/wallpaper/nbig/3/5c/peyzazh-zvezdnoe-nebo-zvezdy.webp');
-  background-size: cover;
-  
-  opacity: 0.3;
-  z-index: -1;
-}
+    /* Starry background effect */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://img.goodfon.com/wallpaper/nbig/3/5c/peyzazh-zvezdnoe-nebo-zvezdy.webp');
+      background-size: cover;
 
-/* Header */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 30px;
-  background-color: rgba(20, 20, 30, 0.9);
-  box-shadow: 0 0 10px #00ffe0;
-  border-bottom: 1px solid #333;
-}
+      opacity: 0.3;
+      z-index: -1;
+    }
 
-/* Header sections */
-.header-left {
-  font-size: 18px;
-  font-weight: bold;
-  color: #00ffe0;
-}
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+      background-color: rgba(20, 20, 30, 0.9);
+      box-shadow: 0 0 10px #00ffe0;
+      border-bottom: 1px solid #333;
+    }
 
-.header-center {
-  font-size: 24px;
-  font-weight: bold;
-  flex-grow: 1;
-  text-align: center;
-  color: #fff;
-}
+    /* Header sections */
+    .header-left {
+      font-size: 18px;
+      font-weight: bold;
+      color: #00ffe0;
+    }
 
-.header-right button {
-  padding: 6px 15px;
-  background-color: #00ffe0;
-  border: none;
-  color: #000;
-  font-weight: bold;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: 0.3s;
-}
+    .header-center {
+      font-size: 24px;
+      font-weight: bold;
+      flex-grow: 1;
+      text-align: center;
+      color: #fff;
+    }
 
-.header-right button:hover {
-  background-color: #00c7b0;
-}
+    .header-right button {
+      padding: 6px 15px;
+      background-color: #00ffe0;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-/* Main container */
-.container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
-  max-width: 1200px;
-  margin: 30px auto;
-}
+    .header-right button:hover {
+      background-color: #00c7b0;
+    }
 
-/* Left panel */
-.left {
-  padding-right: 20px;
-}
+    /* Main container */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      max-width: 1200px;
+      margin: 30px auto;
+    }
 
-/* Right panel */
-.right {
-  padding-left: 20px;
-}
+    /* Left panel */
+    .left {
+      padding-right: 20px;
+    }
 
-/* Task form */
-form input, form button {
-  width: 100%;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 8px;
-  border: none;
-  box-sizing: border-box;
-  background-color: #222;
-  color: #fff;
-}
+    /* Right panel */
+    .right {
+      padding-left: 20px;
+    }
 
-form input::placeholder {
-  color: #888;
-}
+    /* Task form */
+    form input,
+    form button {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 8px;
+      border: none;
+      box-sizing: border-box;
+      background-color: #222;
+      color: #fff;
+    }
 
-form button {
-  background-color: #00ffe0;
-  color: #000;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
+    form input::placeholder {
+      color: #888;
+    }
 
-form button:hover {
-  background-color: #00c7b0;
-}
+    form button {
+      background-color: #00ffe0;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-/* Task list items */
-#taskList li {
-  background-color: rgba(30,30,40,0.9);
-  padding: 12px 15px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 0 10px rgba(0,255,224,0.3);
-}
+    form button:hover {
+      background-color: #00c7b0;
+    }
 
-#taskList li button {
-  margin-left: 5px;
-  padding: 4px 8px;
-  font-size: 12px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-}
+    /* Task list items */
+    #taskList li {
+      background-color: rgba(30, 30, 40, 0.9);
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 0 10px rgba(0, 255, 224, 0.3);
+    }
 
-#taskList li button:nth-child(2) { background-color: #4caf50; color: white; } /* Edit */
-#taskList li button:nth-child(3) { background-color: #f44336; color: white; } /* Delete */
+    #taskList li button {
+      margin-left: 5px;
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
 
-/* Charts */
-canvas {
-  max-width: 100%;
-  margin-top: 20px;
-  background-color: rgba(20,20,30,0.8);
-  border-radius: 10px;
-  padding: 10px;
-}
+    #taskList li button:nth-child(2) {
+      background-color: #4caf50;
+      color: white;
+    }
 
-/* Headings */
-h2 {
-  color: #00ffe0;
-  margin-bottom: 10px;
-}
+    /* Edit */
+    #taskList li button:nth-child(3) {
+      background-color: #f44336;
+      color: white;
+    }
 
+    /* Delete */
 
+    /* Charts */
+    canvas {
+      max-width: 100%;
+      margin-top: 20px;
+      background-color: rgba(20, 20, 30, 0.8);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    /* Headings */
+    h2 {
+      color: #00ffe0;
+      margin-bottom: 10px;
+    }
+
+    /* Footer styling */
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 15px 0;
+      color: #00ffe0;
+      font-style: italic;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      background-color: rgba(20, 20, 30, 0.9);
+      border-top: 1px solid rgba(0, 255, 224, 0.2);
+      box-shadow: 0 -2px 10px rgba(0, 255, 224, 0.1);
+    }
+
+    footer:hover {
+      color: #00c7b0;
+    }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -201,6 +228,12 @@ h2 {
       <h2>Monthly Records</h2>
       <canvas id="monthlyChart"></canvas>
     </div>
+  </div>
+  <div>
+    <footer style="text-align:center; margin-top:30px; color:#00ffe0; font-style:italic;">
+      "Every task completed is a step closer to your goals."
+    </footer>
+
   </div>
 
   <script>
