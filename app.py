@@ -5,8 +5,21 @@ app = Flask(__name__)
 app.secret_key = "secret"   # session key
 
 # PostgreSQL connection
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678@localhost:5432/taskdb'
+import os
+from flask_sqlalchemy import SQLAlchemy
+
+# DATABASE CONFIG
+uri = os.getenv("DATABASE_URL")  # Gets DATABASE_URL from environment (Render or local)
+if uri and uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)  # Fix SQLAlchemy prefix
+
+# Fallback to SQLite for local testing
+app.config['SQLALCHEMY_DATABASE_URI'] = uri or "sqlite:///local.db"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
+
+
 
 # User table
 class User(db.Model):
