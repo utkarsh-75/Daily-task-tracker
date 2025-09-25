@@ -1,20 +1,183 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .left { border-right: 1px solid #ddd; padding-right: 20px; }
-    .right { padding-left: 20px; }
-    canvas { max-width: 100%; }
-    li { margin-bottom: 5px; }
-    button { margin-left: 5px; }
+   /* Reset defaults */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(ellipse at bottom, #0d0d0d 0%, #1a1a1a 100%);
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Starry background effect */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('https://img.goodfon.com/wallpaper/nbig/3/5c/peyzazh-zvezdnoe-nebo-zvezdy.webp');
+  background-size: cover;
+  
+  opacity: 0.3;
+  z-index: -1;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 30px;
+  background-color: rgba(20, 20, 30, 0.9);
+  box-shadow: 0 0 10px #00ffe0;
+  border-bottom: 1px solid #333;
+}
+
+/* Header sections */
+.header-left {
+  font-size: 18px;
+  font-weight: bold;
+  color: #00ffe0;
+}
+
+.header-center {
+  font-size: 24px;
+  font-weight: bold;
+  flex-grow: 1;
+  text-align: center;
+  color: #fff;
+}
+
+.header-right button {
+  padding: 6px 15px;
+  background-color: #00ffe0;
+  border: none;
+  color: #000;
+  font-weight: bold;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.header-right button:hover {
+  background-color: #00c7b0;
+}
+
+/* Main container */
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 30px auto;
+}
+
+/* Left panel */
+.left {
+  padding-right: 20px;
+}
+
+/* Right panel */
+.right {
+  padding-left: 20px;
+}
+
+/* Task form */
+form input, form button {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+  border: none;
+  box-sizing: border-box;
+  background-color: #222;
+  color: #fff;
+}
+
+form input::placeholder {
+  color: #888;
+}
+
+form button {
+  background-color: #00ffe0;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+form button:hover {
+  background-color: #00c7b0;
+}
+
+/* Task list items */
+#taskList li {
+  background-color: rgba(30,30,40,0.9);
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 10px rgba(0,255,224,0.3);
+}
+
+#taskList li button {
+  margin-left: 5px;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+#taskList li button:nth-child(2) { background-color: #4caf50; color: white; } /* Edit */
+#taskList li button:nth-child(3) { background-color: #f44336; color: white; } /* Delete */
+
+/* Charts */
+canvas {
+  max-width: 100%;
+  margin-top: 20px;
+  background-color: rgba(20,20,30,0.8);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+/* Headings */
+h2 {
+  color: #00ffe0;
+  margin-bottom: 10px;
+}
+
+
   </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Edu+NSW+ACT+Cursive:wght@400..700&display=swap"
+    rel="stylesheet">
+
 </head>
+
 <body>
-  <h1>Dashboard</h1>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">TASK ZONE</div>
+
+    <div class="header-right">
+      <button onclick="window.location.href='/logout'">Sign Out</button>
+    </div>
+  </div>
+
 
   <div class="container">
     <!-- Left side: form + task list -->
@@ -40,113 +203,114 @@
     </div>
   </div>
 
-<script>
-async function loadTasks() {
-  const res = await fetch('/api/tasks');
-  const tasks = await res.json();
-  renderTasks(tasks);
-  renderCharts(tasks);
-}
+  <script>
+    async function loadTasks() {
+      const res = await fetch('/api/tasks');
+      const tasks = await res.json();
+      renderTasks(tasks);
+      renderCharts(tasks);
+    }
 
-function renderTasks(tasks) {
-  const list = document.getElementById('taskList');
-  list.innerHTML = '';
+    function renderTasks(tasks) {
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
 
-  tasks.forEach(t => {
-    const li = document.createElement('li');
-    li.innerHTML = `
+      tasks.forEach(t => {
+        const li = document.createElement('li');
+        li.innerHTML = `
       ${t.title} - ${t.duration} mins (${t.start_time} → ${t.end_time})
       <button onclick="editTask(${t.id}, '${t.title}', '${t.start_time}', '${t.end_time}')">Edit</button>
       <button onclick="deleteTask(${t.id})">Delete</button>
     `;
-    list.appendChild(li);
-  });
-}
+        list.appendChild(li);
+      });
+    }
 
-function renderCharts(tasks) {
-  const daily = {};
-  const monthly = {};
+    function renderCharts(tasks) {
+      const daily = {};
+      const monthly = {};
 
-  tasks.forEach(t => {
-    const day = new Date(t.start_time).toLocaleDateString();
-    daily[day] = (daily[day] || 0) + t.duration;
+      tasks.forEach(t => {
+        const day = new Date(t.start_time).toLocaleDateString();
+        daily[day] = (daily[day] || 0) + t.duration;
 
-    const month = new Date(t.start_time).toLocaleString('default', { month: 'short', year: 'numeric' });
-    monthly[month] = (monthly[month] || 0) + t.duration;
-  });
+        const month = new Date(t.start_time).toLocaleString('default', { month: 'short', year: 'numeric' });
+        monthly[month] = (monthly[month] || 0) + t.duration;
+      });
 
-  new Chart(document.getElementById('dailyChart'), {
-    type: 'bar',
-    data: { labels: Object.keys(daily), datasets: [{ label: 'Minutes Spent per Day', data: Object.values(daily) }] }
-  });
+      new Chart(document.getElementById('dailyChart'), {
+        type: 'bar',
+        data: { labels: Object.keys(daily), datasets: [{ label: 'Minutes Spent per Day', data: Object.values(daily) }] }
+      });
 
-  new Chart(document.getElementById('monthlyChart'), {
-    type: 'line',
-    data: { labels: Object.keys(monthly), datasets: [{ label: 'Minutes Spent per Month', data: Object.values(monthly) }] }
-  });
-}
+      new Chart(document.getElementById('monthlyChart'), {
+        type: 'line',
+        data: { labels: Object.keys(monthly), datasets: [{ label: 'Minutes Spent per Month', data: Object.values(monthly) }] }
+      });
+    }
 
-// Add Task
-document.getElementById('taskForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const data = Object.fromEntries(new FormData(e.target).entries());
+    // Add Task
+    document.getElementById('taskForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target).entries());
 
-  if (data.start_time.length === 16) data.start_time += ":00";
-  if (data.end_time.length === 16) data.end_time += ":00";
+      if (data.start_time.length === 16) data.start_time += ":00";
+      if (data.end_time.length === 16) data.end_time += ":00";
 
-  await fetch('/api/tasks', {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+      await fetch('/api/tasks', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
 
-  e.target.reset();
-  loadTasks();
-});
-
-// Delete Task
-async function deleteTask(id) {
-  if (!confirm("Are you sure you want to delete this task?")) return;
-  await fetch(`/api/tasks/${id}`, { method: "DELETE" });
-  loadTasks();
-}
-
-// Edit Task
-function editTask(id, title, start_time, end_time) {
-  const form = document.getElementById('taskForm');
-  form.title.value = title;
-  form.start_time.value = start_time.slice(0,16);
-  form.end_time.value = end_time.slice(0,16);
-
-  form.onsubmit = async function(e) {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(form).entries());
-    if (data.start_time.length === 16) data.start_time += ":00";
-    if (data.end_time.length === 16) data.end_time += ":00";
-
-    await fetch(`/api/tasks/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      e.target.reset();
+      loadTasks();
     });
 
-    form.reset();
-    // Restore default add behavior
-    form.onsubmit = async function(e) {
-      e.preventDefault();
-      const newData = Object.fromEntries(new FormData(form).entries());
-      if (newData.start_time.length === 16) newData.start_time += ":00";
-      if (newData.end_time.length === 16) newData.end_time += ":00";
-      await fetch('/api/tasks', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newData) });
-      form.reset();
+    // Delete Task
+    async function deleteTask(id) {
+      if (!confirm("Are you sure you want to delete this task?")) return;
+      await fetch(`/api/tasks/${id}`, { method: "DELETE" });
       loadTasks();
     }
 
-    loadTasks();
-  }
-}
+    // Edit Task
+    function editTask(id, title, start_time, end_time) {
+      const form = document.getElementById('taskForm');
+      form.title.value = title;
+      form.start_time.value = start_time.slice(0, 16);
+      form.end_time.value = end_time.slice(0, 16);
 
-loadTasks();
-</script>
+      form.onsubmit = async function (e) {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(form).entries());
+        if (data.start_time.length === 16) data.start_time += ":00";
+        if (data.end_time.length === 16) data.end_time += ":00";
+
+        await fetch(`/api/tasks/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        form.reset();
+        // Restore default add behavior
+        form.onsubmit = async function (e) {
+          e.preventDefault();
+          const newData = Object.fromEntries(new FormData(form).entries());
+          if (newData.start_time.length === 16) newData.start_time += ":00";
+          if (newData.end_time.length === 16) newData.end_time += ":00";
+          await fetch('/api/tasks', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newData) });
+          form.reset();
+          loadTasks();
+        }
+
+        loadTasks();
+      }
+    }
+
+    loadTasks();
+  </script>
 </body>
+
 </html>

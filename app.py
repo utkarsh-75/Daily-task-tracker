@@ -161,5 +161,12 @@ def update_delete_task(task_id):
         return jsonify({"success": True})
 
 
+@app.route("/logout")
+def logout():
+    # Clear all session data
+    session.clear()
+    # Redirect to login page
+    return redirect(url_for("login"))
+
 if __name__ == "__main__":
     app.run(debug=True)
