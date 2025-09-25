@@ -186,6 +186,52 @@
     footer:hover {
       color: #00c7b0;
     }
+
+    /* Table Styling */
+#taskTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background-color: rgba(30, 30, 40, 0.9);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 255, 224, 0.3);
+}
+
+#taskTable th, #taskTable td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 255, 224, 0.2);
+}
+
+#taskTable th {
+  background-color: rgba(0, 255, 224, 0.1);
+  color: #00ffe0;
+}
+
+#taskTable tr:hover {
+  background-color: rgba(0, 255, 224, 0.05);
+}
+
+#taskTable button {
+  margin: 0 3px;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+#taskTable button:first-child {
+  background-color: #4caf50;
+  color: white;
+}
+
+#taskTable button:last-child {
+  background-color: #f44336;
+  color: white;
+}
+
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -215,9 +261,19 @@
         <input type="datetime-local" name="end_time" required>
         <button type="submit">Add Task</button>
       </form>
-
       <h2>Your Tasks</h2>
-      <ul id="taskList"></ul>
+      <table id="taskTable">
+        <thead>
+          <tr>
+            <th>S.No.</th>
+            <th>Time</th>
+            <th>Title</th>
+            <th>Duration (mins)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="taskList"></tbody>
+      </table>
     </div>
 
     <!-- Right side: charts -->
@@ -245,20 +301,24 @@
     }
 
     function renderTasks(tasks) {
-      const list = document.getElementById('taskList');
-      list.innerHTML = '';
+      const tbody = document.getElementById('taskList');
+      tbody.innerHTML = '';
 
-      tasks.forEach(t => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-      ${t.title} - ${t.duration} mins (${t.start_time} → ${t.end_time})
-      <button onclick="editTask(${t.id}, '${t.title}', '${t.start_time}', '${t.end_time}')">Edit</button>
-      <button onclick="deleteTask(${t.id})">Delete</button>
+      tasks.forEach((t, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${t.start_time} → ${t.end_time}</td>
+      <td>${t.title}</td>
+      <td>${t.duration}</td>
+      <td>
+        <button onclick="editTask(${t.id}, '${t.title}', '${t.start_time}', '${t.end_time}')">Edit</button>
+        <button onclick="deleteTask(${t.id})">Delete</button>
+      </td>
     `;
-        list.appendChild(li);
+        tbody.appendChild(tr);
       });
     }
-
     function renderCharts(tasks) {
       const daily = {};
       const monthly = {};
