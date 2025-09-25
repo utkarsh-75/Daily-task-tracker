@@ -1,17 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
 app.secret_key = "secret"   # session key
 
-# PostgreSQL connection
-import os
-from flask_sqlalchemy import SQLAlchemy
-
 # DATABASE CONFIG
 uri = os.getenv("DATABASE_URL")  # Gets DATABASE_URL from environment (Render or local)
+
+# Fix SQLAlchemy URL prefix if needed
 if uri and uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1)  # Fix SQLAlchemy prefix
+    uri = uri.replace("postgres://", "postgresql://", 1)
 
 # Fallback to SQLite for local testing
 app.config['SQLALCHEMY_DATABASE_URI'] = uri or "sqlite:///local.db"
